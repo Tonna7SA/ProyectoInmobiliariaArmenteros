@@ -1,3 +1,12 @@
+.body{
+    display: grid;
+    grid-template-columns: repeat(auto-fit,
+        minmax(150px, 1fr));
+    gap: 32px;
+    background-image: url('../img/Inmobiliaria.jpg');
+    background-size: cover;
+}
+
 .full-width-image {
     width: 100vw;
     height: 230px;
@@ -5,127 +14,84 @@
 
 a {
     text-decoration: none;
-    /* Elimina el subrayado */
 }
 
-/* Estilo para enlaces no visitados */
 a:link {
     color: inherit;
-    /* Mantén el color original */
 }
 
-/* Estilo para enlaces visitados */
 a:visited {
     color: inherit;
-    /* Mantén el color original */
 }
 
 .img-thumbnail {
     width: 100px;
-    /* Ancho fijo */
     height: 100px;
-    /* Alto fijo */
     object-fit: cover;
-    /* Escalar y recortar para que encaje */
     object-position: center;
-    /* Centrar la parte visible de la imagen */
 }
 
-.hache3, .hache4 {
-    margin-bottom: 20px; /* Puedes ajustar el valor según tus preferencias de espaciado */
+.hache3,
+.hache4 {
+    margin-bottom: 20px;
 }
 
-/* Puedes agregar estilos adicionales aquí */
-/* .navbar-nav .nav-item {
-    border-right: 1px solid #ccc;
-   
+.blockquote p {
+    font-size: 16px;
 }
 
-.navbar-nav .nav-item:last-child {
-    border-right: none;
+.blockquote-footer {
+    font-size: 14px;
 }
 
-.custom-toggler .navbar-toggler-icon {
-    background-color: black;
-} */
-
-/* .navBar{
-    background-color: #fff !important;
+.image-box {
+    margin: 20px;
+    padding: 10px;
+    background: rgba(33, 37, 41, 0.3);
 }
 
-.elementosNav{
-    display: flex;
-    width: 30%;
-    justify-content: space-around;
-    color: #37474f;
-    font-weight: 700;
+.custom-text {
+    color: #333;
 }
 
-.elementos{
-    margin-right: 50px;
-}
-
-.containerImg{
-    width: 20%;
-}
-
-.logo{
-    width: 40%;
-    margin: auto;
-}
-
-.tituloBiblioteca{
-    width: 80%;
-    text-align: center;
-    font-size: 40px;
-    margin-top: 80px;
-    font-weight: 500;
-}
-
-.header{
-    background-image: url(../img/FondoZoom_2.jpg);
+body::before {
+    content: "";
+    background-image: url('../img/Inmobiliaria.jpg');
     background-size: cover;
-    height: 550px;
-    display: flex;
-    justify-content: end;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.;
+    z-index: -1;
 }
 
-.contenedorLibros{
-    margin-top: 80px;
-    display: flex;
-    flex-direction: column;
+.d-flex.justify-content-center {
     justify-content: center;
-    align-items: center;
 }
 
-.tituloLibros{
-    font-size: 22px;
-    font-weight: 500;
+.btn-outline-success {
+    margin: 0 auto;
 }
 
-.contenedorMain{
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Estilo para enlaces no visitados */
+a:link {
+    text-decoration: none;
+    /* Elimina el subrayado */
 }
 
-.containerFooter{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+/* Estilo para enlaces visitados */
+a:visited {
+    text-decoration: none;
+    /* Elimina el subrayado */
 }
 
-.boton{
-    background-color: #ffcb00;
-    box-shadow: 0px 2px 16px 4px rgba(0,0,0,0.36);
-    -webkit-box-shadow: 0px 2px 16px 4px rgba(0,0,0,0.36);
-    -moz-box-shadow: 0px 2px 16px 4px rgba(0,0,0,0.36);
+.loguito{
+    width: 34%; 
 }
-
-.boton:hover{
-    background-color: #ffcb00;
+.loguito-modal{
+    width: 30%; 
 }
-.boton:active{
-    box-shadow: none;
-} */

@@ -1,18 +1,12 @@
 package com.inmobiliaria.armenteros.controladores;
 
-import com.inmobiliaria.armenteros.entidades.Imagen;
-import com.inmobiliaria.armenteros.entidades.Propiedad;
 import com.inmobiliaria.armenteros.entidades.Usuario;
 import com.inmobiliaria.armenteros.excepciones.MiException;
 import com.inmobiliaria.armenteros.repositorios.ImagenRepositorio;
 import com.inmobiliaria.armenteros.repositorios.PropiedadRepositorio;
 import com.inmobiliaria.armenteros.servicios.UsuarioServicio;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
@@ -47,46 +40,27 @@ public class PortalControlador {
         return "redirect:./propiedad/listarPropiedades";
     }
 
-    @GetMapping("/casasPrincipal")
-    public String casasPrincipal(ModelMap modelo) {
+    @GetMapping("/nosotros")
+    public String nosotros() {
 
-        List<Propiedad> propiedades = propiedadRepositorio.findAll();
-        List<Imagen> imagenes = imagenRepositorio.findAll();
-
-        Map<Integer, List<String>> imagenesPorPropiedad = new HashMap<>();
-
-        for (Propiedad aux : propiedades) {
-            Integer idPropiedad = aux.getIdPropiedad();
-            List<String> imagen1 = new ArrayList<>();
-
-            for (Imagen aux1 : imagenes) {
-                if (aux1.getPropiedad().getIdPropiedad() == idPropiedad) {
-                    byte[] foto = aux1.getContenido();
-                    String base = Base64.getEncoder().encodeToString(foto);
-                    imagen1.add(base);
-                }
-            }
-            imagenesPorPropiedad.put(idPropiedad, imagen1);
-        }
-        modelo.addAttribute("propiedades", propiedades);
-        modelo.addAttribute("imagenesPorPropiedad", imagenesPorPropiedad);
-        return "casasPrincipal.html";
+        return "nosotros.html";
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/registrar")
     public String registrar() {
         return "registro.html";
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @PostMapping("/registro")
     public String registro(@RequestParam String nombre, @RequestParam String email, @RequestParam String password, String password2,
-             ModelMap modelo, RedirectAttributes redirectAttributes) throws IOException, MiException {
+            ModelMap modelo, RedirectAttributes redirectAttributes) throws IOException, MiException {
 
         try {
             usuarioServicio.registrar(nombre, email, password, password2);
             redirectAttributes.addFlashAttribute("exito", "El usuario fue cargado correctamente!");
-
-            return "redirect:/";
+            return "redirect:../propiedad/listarPropiedades";
         } catch (MiException ex) {
             modelo.put("error", ex.getMessage());
             modelo.put("nombre", nombre);
@@ -97,28 +71,28 @@ public class PortalControlador {
 
     }
 
-    @GetMapping("/login")
+    @GetMapping("/23433073")
     public String login(@RequestParam(required = false) String error, ModelMap modelo) {
         if (error != null) {
             modelo.put("error", "Usuario o contraseña inválidos");
         }
-        return "login.html";
+        return "23433073.html";
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     @GetMapping("/inicio")
-    public String inicio(HttpSession session) {
+    public String inicio(HttpSession session, RedirectAttributes redirectAttributes) {
 
         Usuario logueado = (Usuario) session.getAttribute("usuariosession");
 
-        if (logueado.getRol().toString().equals("ADMIN")) {
+        if (logueado.getRol().toString().equals("ADMIN") || logueado.getRol().toString().equals("USER")) {
+            redirectAttributes.addFlashAttribute("exito", "El usuario fue logeado correctamente!");
             return "redirect:./propiedad/listarPropiedades";
         }
 
-        return "index.html";
+        return "redirect:./propiedad/listarPropiedades";
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/perfil")
     public String perfil(ModelMap modelo, HttpSession session) {
 
@@ -127,11 +101,11 @@ public class PortalControlador {
         return "usuario_modificar.html";
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @PostMapping("/perfil/{id}")
     public String actualizar(@PathVariable String id, @RequestParam String nombre,
             @RequestParam String email, @RequestParam String password, @RequestParam String password2, ModelMap modelo,
-             RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
 
         try {
             usuarioServicio.actualizar(id, nombre, email, password, password2);
@@ -150,6 +124,7 @@ public class PortalControlador {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/lista")
     public String listar(ModelMap modelo) {
         List<Usuario> usuarios = usuarioServicio.listarUsuarios();

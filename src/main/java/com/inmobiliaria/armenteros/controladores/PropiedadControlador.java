@@ -1,6 +1,5 @@
 package com.inmobiliaria.armenteros.controladores;
 
-import com.inmobiliaria.armenteros.entidades.Imagen;
 import com.inmobiliaria.armenteros.entidades.Propiedad;
 import com.inmobiliaria.armenteros.excepciones.MiException;
 import com.inmobiliaria.armenteros.repositorios.ImagenRepositorio;
@@ -9,12 +8,10 @@ import com.inmobiliaria.armenteros.repositorios.PropietarioRepositorio;
 import com.inmobiliaria.armenteros.servicios.PropiedadServicio;
 import com.inmobiliaria.armenteros.servicios.PropietarioServicio;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,30 +36,21 @@ public class PropiedadControlador {
     PropiedadRepositorio propiedadRepositorio;
     @Autowired
     PropietarioServicio propietarioServicio;
-    @Autowired
-    PropietarioRepositorio propietarioRepositorio;
-    @Autowired
-    ImagenRepositorio imagenRepositorio;
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/registrar/{idPropietario}")
     public String registrar(ModelMap modelo, @PathVariable Long idPropietario) {
 
         modelo.put("propietario", propietarioServicio.getone(idPropietario));
         return "propiedad_form.html";
     }
-
-    @GetMapping("/registrarUno")
-    public String registrarUno(ModelMap modelo) {
-
-        modelo.put("propietario", propietarioRepositorio.buscarPropietarioPorId());
-        return "propiedad_form.html";
-    }
-
+    
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @PostMapping("/registro")
     public String registro(@RequestParam(required = false) Long mts2Totales, @RequestParam(required = false) Long mts2Cubiertos,
             @RequestParam(required = false) Long mts2Descubiertos, @RequestParam(required = false) String localidad,
             @RequestParam(required = false) String barrio, @RequestParam(required = false) String calle,
-            @RequestParam(required = false) String descripcion, @RequestParam(required = false) Integer altura,
+            @RequestParam(required = false) String descripcion, @RequestParam(required = false) String altura,
             @RequestParam(required = false) Integer cantBanios, @RequestParam(required = false) Integer cantHabitaciones,
             @RequestParam(required = false) String estado, @RequestParam(required = false) Boolean aguaCorriente,
             @RequestParam(required = false) Boolean aireAcondicionado, @RequestParam(required = false) Boolean aptoCredito,
@@ -81,8 +69,7 @@ public class PropiedadControlador {
             @RequestParam(required = false) Boolean expensas, @RequestParam(required = false) String tipoVivienda,
             @RequestParam(required = false) Long idPropietario, List<MultipartFile> archivo, @RequestParam(required = false) Long precioPropiedad,
             @RequestParam(required = false) String moneda,
-            RedirectAttributes redirect, ModelMap modelo) throws MiException{
-        System.out.println("sssss");
+            RedirectAttributes redirect, ModelMap modelo) throws MiException {
         modelo.put("propietario", propietarioServicio.getone(idPropietario));
         try {
             propiedadServicio.crearPropiedad(mts2Totales, mts2Cubiertos, mts2Descubiertos, localidad, barrio, calle, descripcion, altura, cantBanios,
@@ -90,11 +77,8 @@ public class PropiedadControlador {
                     permiteMascotas, salonJuegos, gimnasio, luz, pavimento, cocina, patio, quincho, sum, terraza, baulera, parrilla, cochera, pileta,
                     ascensor, lavadero, suite, vestidor, toillete, expensas, tipoVivienda, moneda, idPropietario, archivo, precioPropiedad);
             redirect.addFlashAttribute("exito", "La propiedad fue cargada correctamente");
-            
-            System.out.println("2sssss");
-
+            return "redirect:../";
         } catch (MiException ex) {
-            System.out.println("4sssss");
             redirect.addFlashAttribute("error", ex.getMessage());
             redirect.addFlashAttribute("mts2Totales", mts2Totales);
             redirect.addFlashAttribute("mts2Cubiertos", mts2Cubiertos);
@@ -107,15 +91,12 @@ public class PropiedadControlador {
             redirect.addFlashAttribute("cantBanios", cantBanios);
             redirect.addFlashAttribute("cantHabitaciones", cantHabitaciones);
             redirect.addFlashAttribute("precioPropiedad", precioPropiedad);
-            
-            
-            return "redirect:../propiedad/registrar/" + idPropietario;
 
+            return "redirect:../propiedad/registrar/" + idPropietario;
         }
-        System.out.println("3sssss");
-        return "redirect:/";
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/lista")
     public String listar(ModelMap modelo, @Param("keyword") String keyword) {
         try {
@@ -142,12 +123,12 @@ public class PropiedadControlador {
             List<Propiedad> propiedades = new ArrayList<>();
 
             if (keyword == null) {
-                propiedadRepositorio.findAll().forEach(propiedades::add);
-                ImagenesPorPropiedad(modelo);
+                propiedadRepositorio.ordenarPropiedadPorFechaDesc().forEach(propiedades::add);
+//                ImagenesPorPropiedad(modelo);
             } else {
                 propiedadRepositorio.buscarPropiedadPotTipoDeVivienda(keyword, keyword1, keyword2, keyword3, keyword4, keyword5).forEach(propiedades::add);
                 modelo.addAttribute("keyword", keyword);
-                ImagenesPorPropiedad(modelo);
+//                ImagenesPorPropiedad(modelo);
             }
             modelo.addAttribute("propiedades", propiedades);
         } catch (Exception e) {
@@ -155,53 +136,54 @@ public class PropiedadControlador {
         }
         return "index.html";
     }
+//
+//    public void ImagenesPorPropiedad(ModelMap modelo) {
+//        List<Propiedad> propiedades = propiedadRepositorio.findAll();
+//        List<Imagen> imagenes = imagenRepositorio.findAll();
+//
+//        Map<Integer, List<String>> imagenesPorPropiedad = new HashMap<>();
+//
+//        for (Propiedad aux : propiedades) {
+//            Integer idPropiedad = aux.getIdPropiedad();
+//            List<String> imagen1 = new ArrayList<>();
+//
+//            for (Imagen aux1 : imagenes) {
+//                if (aux1.getPropiedad().getIdPropiedad() == idPropiedad) {
+//                    byte[] foto = aux1.getContenido();
+//                    String base = Base64.getEncoder().encodeToString(foto);
+//                    imagen1.add(base);
+//                }
+//            }
+//            imagenesPorPropiedad.put(idPropiedad, imagen1);
+//        }
+//        modelo.addAttribute("propiedades", propiedades);
+//        modelo.addAttribute("imagenesPorPropiedad", imagenesPorPropiedad);
+//
+//    }
 
-    public void ImagenesPorPropiedad(ModelMap modelo) {
-        List<Propiedad> propiedades = propiedadRepositorio.findAll();
-        List<Imagen> imagenes = imagenRepositorio.findAll();
-
-        Map<Integer, List<String>> imagenesPorPropiedad = new HashMap<>();
-
-        for (Propiedad aux : propiedades) {
-            Integer idPropiedad = aux.getIdPropiedad();
-            List<String> imagen1 = new ArrayList<>();
-
-            for (Imagen aux1 : imagenes) {
-                if (aux1.getPropiedad().getIdPropiedad() == idPropiedad) {
-                    byte[] foto = aux1.getContenido();
-                    String base = Base64.getEncoder().encodeToString(foto);
-                    imagen1.add(base);
-                }
-            }
-            imagenesPorPropiedad.put(idPropiedad, imagen1);
-        }
-        modelo.addAttribute("propiedades", propiedades);
-        modelo.addAttribute("imagenesPorPropiedad", imagenesPorPropiedad);
-
-    }
-
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("modificar/{idPropiedad}")
     public String modificar(@PathVariable Integer idPropiedad, ModelMap modelo) throws MiException {
-    
+
         modelo.put("propiedad", propiedadServicio.getone(idPropiedad));
         Long algo = propiedadServicio.getone(idPropiedad).getPropietario().getIdPropietario();
         modelo.put("propietario", propietarioServicio.getone(algo));
 
         return "propiedad_modificar.html";
     }
-    
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @PostMapping("modificar/{idPropiedad}")
     public String modificar(@PathVariable Integer idPropiedad, Long mts2Totales, Long mts2Cubiertos, Long mts2Descubiertos, String localidad, String barrio, String calle,
-            String descripcion, Integer altura, Integer cantBanios, Integer cantHabitaciones, String estado, Boolean aguaCorriente, Boolean aireAcondicionado,
+            String descripcion, String altura, Integer cantBanios, Integer cantHabitaciones, String estado, Boolean aguaCorriente, Boolean aireAcondicionado,
             Boolean aptoCredito, Boolean balcon, Boolean banio, Boolean aptoProfesional, Boolean cloacas, Boolean gasNatural, Boolean permiteMascotas, Boolean salonJuegos,
             Boolean gimnasio, Boolean luz, Boolean pavimento, Boolean cocina, Boolean patio, Boolean quincho, Boolean sum, Boolean terraza, Boolean baulera, Boolean parrilla,
-            Boolean cochera, Boolean pileta, Boolean ascensor, Boolean lavadero, Boolean suite, Boolean vestidor, Boolean toillete, Boolean expensas, String tipoVivienda, 
+            Boolean cochera, Boolean pileta, Boolean ascensor, Boolean lavadero, Boolean suite, Boolean vestidor, Boolean toillete, Boolean expensas, String tipoVivienda,
             Long precioPropiedad, String moneda, ModelMap modelo, RedirectAttributes redirect) throws MiException {
         try {
-            propiedadServicio.modificarPropiedad(idPropiedad, mts2Totales, mts2Cubiertos, mts2Descubiertos, localidad, barrio, calle, descripcion, altura, cantBanios, 
+            propiedadServicio.modificarPropiedad(idPropiedad, mts2Totales, mts2Cubiertos, mts2Descubiertos, localidad, barrio, calle, descripcion, altura, cantBanios,
                     cantHabitaciones, estado, aguaCorriente, aireAcondicionado, aptoCredito, balcon, banio, aptoProfesional, cloacas, gasNatural, permiteMascotas,
-                    salonJuegos, gimnasio, luz, pavimento, cocina, patio, quincho, sum, terraza, baulera, parrilla, cochera, pileta, ascensor, lavadero, suite, 
+                    salonJuegos, gimnasio, luz, pavimento, cocina, patio, quincho, sum, terraza, baulera, parrilla, cochera, pileta, ascensor, lavadero, suite,
                     vestidor, toillete, expensas, tipoVivienda, precioPropiedad, moneda);
             redirect.addFlashAttribute("exito", "Ha sido modificada correctamente.");
             return "redirect:../lista";
@@ -209,6 +191,27 @@ public class PropiedadControlador {
             redirect.addFlashAttribute("error", ex.getMessage());
             return "propiedad_modificar.html";
         }
-    }    
-    
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @GetMapping("eliminar/{idPropiedad}")
+    public String eliminarPropiedad(@PathVariable Integer idPropiedad, RedirectAttributes redirect) throws MiException {
+        propiedadServicio.eliminarPropiedad(idPropiedad);
+        return "redirect:../lista";
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @GetMapping("darDeBaja/{idPropiedad}")
+    public String cambiarPropiedad(@PathVariable Integer idPropiedad, RedirectAttributes redirect) throws MiException {
+        propiedadServicio.estadoPropiedad(idPropiedad);
+        return "redirect:../lista";
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @GetMapping("reservar/{idPropiedad}")
+    public String reservaPropiedad(@PathVariable Integer idPropiedad, RedirectAttributes redirect) throws MiException {
+        propiedadServicio.reservaPropiedad(idPropiedad);
+        return "redirect:../lista";
+    }
+
 }

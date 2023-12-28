@@ -33,7 +33,7 @@ public class PropiedadServicio {
 
     @Transactional
     public void crearPropiedad(Long mts2Totales, Long mts2Cubiertos, Long mts2Descubiertos, String localidad, String barrio, String calle,
-            String descripcion, Integer altura, Integer cantBanios, Integer cantHabitaciones, String estado, Boolean aguaCorriente, Boolean aireAcondicionado,
+            String descripcion, String altura, Integer cantBanios, Integer cantHabitaciones, String estado, Boolean aguaCorriente, Boolean aireAcondicionado,
             Boolean aptoCredito, Boolean balcon, Boolean banio, Boolean aptoProfesional, Boolean cloacas, Boolean gasNatural, Boolean permiteMascotas, Boolean salonJuegos,
             Boolean gimnasio, Boolean luz, Boolean pavimento, Boolean cocina, Boolean patio, Boolean quincho, Boolean sum, Boolean terraza, Boolean baulera, Boolean parrilla,
             Boolean cochera, Boolean pileta, Boolean ascensor, Boolean lavadero, Boolean suite, Boolean vestidor, Boolean toillete, Boolean expensas, String tipoVivienda, String moneda, Long idPropietario,
@@ -54,9 +54,9 @@ public class PropiedadServicio {
             propiedad.setMts2Totales(mts2Totales);
             propiedad.setMts2Cubiertos(mts2Cubiertos);
             propiedad.setMts2Descubiertos(mts2Descubiertos);
-            propiedad.setLocalidad(localidad);
-            propiedad.setBarrio(barrio);
-            propiedad.setCalle(calle);
+            propiedad.setLocalidad(cambiarPrimeraLetraCadaPalabra(localidad));
+            propiedad.setBarrio(cambiarPrimeraLetraCadaPalabra(barrio));
+            propiedad.setCalle(cambiarPrimeraLetraCadaPalabra(calle));
             propiedad.setAltura(altura);
             propiedad.setEstado(estado);
             propiedad.setDescripcion(descripcion);
@@ -170,6 +170,33 @@ public class PropiedadServicio {
         }
     }
 
+    public static String cambiarPrimeraLetraCadaPalabra(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return texto;
+        }
+
+        String[] palabras = texto.split(" ");
+        StringBuilder resultado = new StringBuilder();
+
+        for (int i = 0; i < palabras.length; i++) {
+            String palabra = palabras[i];
+            if (!palabra.isEmpty()) {
+                if (i == 0) {
+                    resultado.append(palabra.substring(0, 1).toUpperCase());
+                    resultado.append(palabra.substring(1).toLowerCase());
+                } else if (palabra.length() == 2) {
+                    resultado.append(palabra.toLowerCase());
+                } else {
+                    resultado.append(palabra.substring(0, 1).toUpperCase());
+                    resultado.append(palabra.substring(1).toLowerCase());
+                }
+                resultado.append(" ");
+            }
+        }
+
+        return resultado.toString().trim(); // Elimina el espacio en blanco al final.
+    }
+
     public List<Propiedad> listarPropiedades() {
 
         List<Propiedad> propiedades = new ArrayList();
@@ -181,7 +208,7 @@ public class PropiedadServicio {
 
     @Transactional
     public void modificarPropiedad(Integer idPropiedad, Long mts2Totales, Long mts2Cubiertos, Long mts2Descubiertos, String localidad, String barrio, String calle,
-            String descripcion, Integer altura, Integer cantBanios, Integer cantHabitaciones, String estado, Boolean aguaCorriente, Boolean aireAcondicionado,
+            String descripcion, String altura, Integer cantBanios, Integer cantHabitaciones, String estado, Boolean aguaCorriente, Boolean aireAcondicionado,
             Boolean aptoCredito, Boolean balcon, Boolean banio, Boolean aptoProfesional, Boolean cloacas, Boolean gasNatural, Boolean permiteMascotas, Boolean salonJuegos,
             Boolean gimnasio, Boolean luz, Boolean pavimento, Boolean cocina, Boolean patio, Boolean quincho, Boolean sum, Boolean terraza, Boolean baulera, Boolean parrilla,
             Boolean cochera, Boolean pileta, Boolean ascensor, Boolean lavadero, Boolean suite, Boolean vestidor, Boolean toillete, Boolean expensas, String tipoVivienda,
@@ -359,16 +386,55 @@ public class PropiedadServicio {
         Optional<Propiedad> respuesta = propiedadRepositorio.findById(idPropiedad);
 
         if (respuesta.isPresent()) {
+            imagenServicio.eliminarImagen(idPropiedad);
             Propiedad propiedad = respuesta.get();
             propiedadRepositorio.delete(propiedad);
         }
     }
 
+    public void estadoPropiedad(Integer idPropiedad) throws MiException {
+
+        Optional<Propiedad> respuesta = propiedadRepositorio.findById(idPropiedad);
+
+        if (respuesta.isPresent()) {
+
+            Propiedad propiedad = respuesta.get();
+            if (propiedad.getEstadoComercial() != null) {
+                if (propiedad.getEstadoComercial() == true) {
+                    propiedad.setEstadoComercial(false);
+                } else {
+                    propiedad.setEstadoComercial(true);
+                }
+                propiedadRepositorio.save(propiedad);
+            }
+        }
+    }
+    
+     public void reservaPropiedad(Integer idPropiedad) throws MiException {
+
+        Optional<Propiedad> respuesta = propiedadRepositorio.findById(idPropiedad);
+
+        if (respuesta.isPresent()) {
+
+            Propiedad propiedad = respuesta.get();
+            
+            if (propiedad.getReserva() != null) {
+                if (propiedad.getReserva() == true) {
+                    propiedad.setReserva(false);
+                } else {
+                    propiedad.setReserva(true);
+                }
+                propiedadRepositorio.save(propiedad);
+            }
+        }
+    }
+    
+
     public Propiedad getone(Integer idPropiedad) {
         return propiedadRepositorio.getOne(idPropiedad);
     }
 
-    private void validar(String localidad, String barrio, String calle, String descripcion, Long mts2Totales, Long mts2Cubiertos, Long mts2Descubiertos, Integer altura, Integer cantBanios,
+    private void validar(String localidad, String barrio, String calle, String descripcion, Long mts2Totales, Long mts2Cubiertos, Long mts2Descubiertos, String altura, Integer cantBanios,
             Integer cantHabitaciones, String estado, String tipoVivienda, Long precioPropiedad, String moneda) throws MiException {
 
         if (tipoVivienda.isEmpty()) {
@@ -392,7 +458,7 @@ public class PropiedadServicio {
         if (calle.isEmpty() || calle == null) {
             throw new MiException("La Calle no puede estar vacia");
         }
-        if (altura == null) {
+        if (altura .isEmpty() || altura == null) {
             throw new MiException("La Altura no puede estar vacia");
         }
         if (descripcion.isEmpty() || descripcion == null) {

@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,26 +54,10 @@ public class ImagenControlador {
         return "carruselImagenes.html";
     }
 
-//    @GetMapping("/listaDeImagenes/{idPropiedad}")
-//    public String obtenerImagenesPropiedad(ModelMap modelo, Integer idPropiedad) {
-//
-//        List<Imagen> imagenes = imagenRepositorio.listaImagenes(idPropiedad);
-//        List<String> imagen1 = new ArrayList<>();
-//
-//        for (Imagen aux : imagenes) {
-//            byte[] foto = aux.getContenido();
-//            String base = Base64.getEncoder().encodeToString(foto);
-//            imagen1.add(base);
-//        }
-//        modelo.addAttribute("imagen1", imagen1);
-//        return "carruselImagenes.html";
-//    }
-
     @GetMapping("/propiedad/{idPropiedad}")
     public String listarImagenesPropiedad(ModelMap modelo, @PathVariable Integer idPropiedad) {
         Propiedad propiedad = propiedadServicio.getone(idPropiedad);
         List<Imagen> imagenes = imagenRepositorio.listaImagenes(idPropiedad);
-        System.out.println("aca Ta!!");
         List<String> imagen1 = new ArrayList<>();
 
         for (Imagen aux : imagenes) {
@@ -94,20 +79,20 @@ public class ImagenControlador {
 
         HttpHeaders headers = new HttpHeaders();
 
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.IMAGE_JPEG);
 
         System.out.println(foto);
         return new ResponseEntity<>(foto, headers, HttpStatus.OK);
 
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/modificar/{idPropiedad}")
     public String modificar(@PathVariable Integer idPropiedad, ModelMap modelo) throws MiException {
 
         modelo.put("propiedad", propiedadServicio.getone(idPropiedad));
         Propiedad propiedad = propiedadServicio.getone(idPropiedad);
         List<Imagen> imagenes = imagenRepositorio.listaImagenes(idPropiedad);
-        System.out.println("aca Ta!!");
         List<String> imagen1 = new ArrayList<>();
 
         for (Imagen aux : imagenes) {
@@ -122,6 +107,7 @@ public class ImagenControlador {
         return "imagenes_modificar.html";
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/modificar1/{idImagen}")
     public String modificarImagen(@PathVariable Integer idImagen, ModelMap modelo, RedirectAttributes redirect) throws MiException {
 
@@ -129,7 +115,6 @@ public class ImagenControlador {
         byte[] foto = imagen.getContenido();
         String base = Base64.getEncoder().encodeToString(foto);
         modelo.put("base", base);
-        System.out.println("salida del get");
         return "modificarImagenPropiedad.html";
     }
 
@@ -137,36 +122,17 @@ public class ImagenControlador {
     public String modificarImagen1(@PathVariable Integer idImagen, MultipartFile archivo, ModelMap modelo, RedirectAttributes redirect) throws MiException {
 
         Integer idPropiedad = imagenServicio.getone(idImagen).getPropiedad().getIdPropiedad();
-        System.out.println("algo" + idPropiedad);
         try {
             imagenServicio.modificarImagen(archivo, idImagen);
             redirect.addFlashAttribute("exito", "La imágen ha sido modificada correctamente.");
-            
+
         } catch (MiException ex) {
             redirect.addFlashAttribute("error", ex.getMessage());
             return "imagenes_modificar.html";
 
         }
 
-       return "redirect:/imagen/modificar/" + idPropiedad;
+        return "redirect:/imagen/modificar/" + idPropiedad;
     }
-//    @PostMapping("/modificar/{idPropiedad}")
-//    public String modificar(@PathVariable Integer idPropiedad, MultipartFile archivo, ModelMap modelo, RedirectAttributes redirect) throws MiException {
-//        try {
-//            // 1. Obtén todas las imágenes relacionadas con la propiedad
-//            List<Imagen> imagenesPropiedad = imagenRepositorio.listaImagenes(idPropiedad); // Reemplaza con el método adecuado
-//
-//            // 2. Itera a través de las imágenes y modifícalas
-//            for (Imagen imagen : imagenesPropiedad) {
-//                imagenServicio.modificarImagen(archivo, imagen.getPropiedad().getIdPropiedad()); // Asume que tienes un método para modificar una imagen específica
-//            }
-//
-//            redirect.addFlashAttribute("exito", "Todas las imágenes han sido modificadas correctamente.");
-//            return "redirect:/";
-//        } catch (MiException ex) {
-//            redirect.addFlashAttribute("error", ex.getMessage());
-//            return "imagenes_modificar.html";
-//        }
-//    }
 
 }

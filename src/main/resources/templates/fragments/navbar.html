@@ -1,75 +1,105 @@
-<div class="container">
-    <div class="container d-flex justify-content-center">
-        <nav class="navbar navbar-expand-lg navbar-light" style="width: 80%;">
-            <div class="container-fluid">
-                <a class="navbar-brand mx-auto" href="/">
-                    <img src="/img/armenteros_1-removebg-preview.png" alt="" width="180" height="65">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav" >
-                    <ul class="navbar-nav mx-auto" th:if="${session.usuariosession != null}">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="propietariosDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Propietarios
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="propietariosDropdown">
-                                <li><a class="dropdown-item" href="../propietario/buscarPropietario">Buscar Propietarios</a></li>
-                                <!-- Agrega más opciones si es necesario -->
-                            </ul>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav mx-auto" th:if="${session.usuariosession != null}">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="propiedadesDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Propiedades
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="propiedadesDropdown" th:if="${session.usuariosession != null}">
-                                <li><a class="dropdown-item" href="/propiedad/lista">Lista Propiedades</a></li>
-                                <!-- Agrega más opciones si es necesario -->
-                            </ul>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav mx-auto" th:if="${session.usuariosession != null}">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Usuarios
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="propiedadesDropdown">
-                                <li><a class="dropdown-item" href="/registrar">Nuevo Usuario </a></li>
-                                <li><a class="dropdown-item" href="/usuario/listarUsuarios">Listar Usuario </a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav mx-auto" th:if="${session.usuariosession != null}">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Mi perfil
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="propiedadesDropdown">
-                                <li><a class="dropdown-item" href="">Modificar Datos </a></li>
-                                <li><a class="dropdown-item" href="/logout">Cerrar Sesion</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav mx-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Tasaciones</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-primary" style="" href="/">Volver</a>
-                            </li>
-                        </ul>
+<header class="p-0 bg-dark text-white">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="/" class="d-flex align-items-center mb-0 mb-lg-0 text-white text-decoration-none">
+                <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+            </a>
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-1 justify-content-center mb-md-0">
+                <li><a href="/" class="nav-link px-2 text-secondary"><img src="/img/armenteros blanco.png"
+                            style="width: 100%; height: 40px;" alt=""></a></li>
+                <li><a href="/" class="nav-link px-2 text-secondary">Inicio</a></li>
+                <li><a href="/propietario/buscarPropietario" th:if="${session.usuariosession != null}"
+                        class="nav-link px-2 text-white">Propietarios</a></li>
+                <li><a href="/propiedad/lista" th:if="${session.usuariosession != null}"
+                        class="nav-link px-2 text-white">Propiedades</a></li>
+                <li class="nav-item dropdown" th:if="${session.usuariosession != null}">
+                    <a href="#" class="nav-link px-2 text-white dropdown-toggle" id="faqsDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Usuarios
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="faqsDropdown">
+                        <a class="dropdown-item" href="/usuario/crearUsuario">Nuevo Usuario</a>
+                        <a class="dropdown-item" href="/usuario/listarUsuarios">Listar Usuario</a>
+                        <a class="dropdown-item" href="/logout">Cerrar Sesión</a>
                     </div>
-                </div>
-            </div>
-        </nav>
+                </li>
+                <li><a href="/nosotros" class="nav-link px-2 text-white">Nosotros</a></li>
+            </ul>
+        </div>
     </div>
-</div>
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="/" class="d-flex align-items-center mb-1 mb-lg-0 text-white text-decoration-none">
+                <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+            </a>
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="#" class="nav-link px-2 text-secondary"></a></li>
+                <li><a href="#" class="nav-link px-2 text-white"></a></li>
+                <li><a href="#" class="nav-link px-2 text-white"></a></li>
+            </ul>
+            <div class="text-end">
+                <figure class="text-end">
+                    <blockquote class="blockquote">
+                        <p style="color: white;">Cañada de Gómez 4509, CABA</p>
+                    </blockquote>
+                    <figcaption class="blockquote-footer">
+                        Teléfono: <cite title="Source Title">11-5051-3333</cite>
+                    </figcaption>
+                    <figcaption class="blockquote-footer" data-toggle="modal" data-target="#contactModal"
+                        style="cursor: pointer;">
+                        armenterospropiedades@gmail.com<cite title="Source Title"></cite>
+                    </figcaption>
+                    <div class="modal fade" id="contactModal" tabindex="-1" role="dialog"
+                        aria-labelledby="contactModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="contactModalLabel">Formulario de contacto</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form action="/mail/enviar-correo" method="POST">
+                                    <div class="modal-body bg-dark text-white">
+                                        <div class="container button-container">
+                                            <div class="mb-3">
+                                                <label for="contactEmail" class="form-label">Tu Correo
+                                                    Electrónico</label>
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    placeholder="name@example.com">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="nombre" class="form-label">Nombre:</label>
+                                                <input type="text" id="nombre" name="nombre" class="form-control"
+                                                    required><br>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="asunto" class="form-label">Asunto:</label>
+                                                <input type="text" id="asunto" name="asunto" class="form-control"
+                                                    required><br>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="contactMessage" class="form-label">Dejá tú consulta</label>
+                                                <textarea class="form-control" id="contactMessage" name="mensaje"
+                                                    rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer bg-dark text-white">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Cerrar</button>
+                                        <button type="submit" class="btn btn-secondary">Enviar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </figure>
+            </div>
+        </div>
+    </div>
+</header>
